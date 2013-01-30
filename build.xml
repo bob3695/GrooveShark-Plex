@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="grooveshark-plex" default="build">
+    <target name="build" description="Build the bundle">
+        <mkdir dir="GrooveShark-Plex" />
+        <mkdir dir="GrooveShark-Plex/Contents" />
+        <mkdir dir="GrooveShark-Plex/Contents/Code" />
+        <mkdir dir="GrooveShark-Plex/Contents/Resources" />
+        <mkdir dir="GrooveShark-Plex/Contents/Services" />
+
+        <!-- Copy root level files -->
+        <copyfile src="Info.plist" dest="GrooveShark-Plex/Contents/Info.plist" />
+
+        <!-- Copy Source Files -->
+        <copyfile src="Code/__init__.py" dest="GrooveShark-Plex/Contents/Code/__init.__.py" />
+        <copyfile src="Code/grooveshark.py" dest="GrooveShark-Plex/Contents/Code/grooveshark.py" />
+
+        <move file="GrooveShark-Plex" tofile="GrooveShark.bundle" />
+    </target>
+</project>
