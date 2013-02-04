@@ -9,7 +9,7 @@
 		<string>MP3</string>
 	</array>
 	<key>PlexClientPlatforms</key>
-	<string>*</string>
+	<string>MacOSX,Linux,Windows,LGTV,Roku</string>
 	<key>PlexFrameworkVersion</key>
 	<string>2</string>
 	<key>PlexMediaContainer</key>

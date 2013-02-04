@@ -5,14 +5,23 @@
         <mkdir dir="GrooveShark-Plex/Contents" />
         <mkdir dir="GrooveShark-Plex/Contents/Code" />
         <mkdir dir="GrooveShark-Plex/Contents/Resources" />
-        <mkdir dir="GrooveShark-Plex/Contents/Services" />
+        <!--<mkdir dir="GrooveShark-Plex/Contents/Services" />-->
 
         <!-- Copy root level files -->
         <copyfile src="Info.plist" dest="GrooveShark-Plex/Contents/Info.plist" />
+        <copyfile src="DefaultPrefs.json" dest="GrooveShark-Plex/Contents/DefaultPrefs.json" />
 
         <!-- Copy Source Files -->
-        <copyfile src="Code/__init__.py" dest="GrooveShark-Plex/Contents/Code/__init.__.py" />
+        <copyfile src="Code/__init__.py" dest="GrooveShark-Plex/Contents/Code/__init__.py" />
         <copyfile src="Code/grooveshark.py" dest="GrooveShark-Plex/Contents/Code/grooveshark.py" />
+
+        <!-- Copy Resource Files -->
+        <copyfile src="Resources/art-default.png" dest="GrooveShark-Plex/Contents/Resources/art-default.png" />
+        <copyfile src="Resources/icon-default.png" dest="GrooveShark-Plex/Contents/Resources/icon-default.png" />
+
+        <!-- Copy Services Files -->
+        <!--<copyfile src="Services/ServiceInfo.plist" dest="GrooveShark-Plex/Contents/Services/ServiceInfo.plist" />
+        <copyfile src="Services/URL/GrooveShark/ServiceCode.pys" dest="GrooveShark-Plex/Contents/Services/URL/GrooveShark/ServiceCode.pys" />-->
 
         <move file="GrooveShark-Plex" tofile="GrooveShark.bundle" />
     </target>
