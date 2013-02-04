@@ -1,6 +1,6 @@
 import grooveshark
 TITLE = 'GrooveShark'
-ART = 'art-default.jpg'
+ART = 'art-default.png'
 ICON = 'icon-default.png'
 
 ####################################################################################################
@@ -29,132 +29,110 @@ def Menu():
             DirectoryObject(
                 key = Callback(UserLibrarySongsMenu),
                 title = "Library"
+            ),
+            DirectoryObject(
+                key = Callback(UserFavoriteSongsMenu),
+                title = "Favorites"
+            ),
+            DirectoryObject(
+                key = Callback(SearchMenu),
+                title = "Search"
             )
         ]
     )
 
     return oc
 
-
-
-    #stream_info = grooveshark.api_call('getSubscriberStreamKey', {"songID": 1826242, "country": COUNTRY_OBJECT})
-    #test_string = JSON.StringFromObject(stream_info)
-    #json_data = {'method': 'startSession', 'parameters': {}, 'header': {'wsKey': 'plex_richard', 'sessionID': ''}}
-
-    #test_string = JSON.ObjectFromURL(URL_BASE + sig, json_data)
-    #log.Info(JSON.StringFromObject(test_string))
-    #test_string = "Hello"
-
-    #track = TrackObject(
-    #    url = "http://groovshark.com",
-    #    title = "Test Song",
-    #    artist = "Test Artist",
-    #    thumb = "http://images.gs-cdn.net/static/albums/120_2467142.jpg"# + songInfo["result"]["songs"][0]["CoverArtFilename"]
-    #)
-
-    #media = MediaObject(
-    #    container = "mp3",
-    #    audio_codec = "mp3"
-    #)
-
-    #media.add(PartObject(key=Callback(PlayAudio, url=stream_info["result"]["url"], ext='mp3')))
-
-    #track.add(media)
-
-    #oc = ObjectContainer(
-    #    objects = [
-    #        DirectoryObject(
-    #            key = Callback(TestMenu),
-    #            title = Prefs["Username"]
-    #        ),
-    #        track
-    #,
-    #TrackObject(
-    #    url = "http://stream79b.grooveshark.com/stream.php?streamKey=f627168c08b88485ef896024f2da14b0afc802a6_510879ff_1bddc2_160d8ea_b491dd49_8_0",
-    #    title = "Test Video"
-    #)
-    #    ]
-    #)
-
-    #return oc
-
 ####################################################################################################
 
 def UserLibrarySongsMenu():
     oc = ObjectContainer(
-        title1 = "Songs"
+        title1 = "Library - Songs"
     )
 
     songs = grooveshark.api_call('getUserLibrarySongs', {})
-    i = 0
+
     for song in songs["result"]["songs"]:
-        coverUrl = ''
-        if song["CoverArtFilename"] != None:
-            coverUrl = song["CoverArtFilename"]
-
-        oc.add(
-            TrackObject(
-                url = "http://groovshark.com/" + str(i),
-                title = song["SongName"],
-                artist = song["ArtistName"],
-                thumb = "http://images.gs-cdn.net/static/albums/" + coverUrl,
-                items = [
-                    MediaObject(
-                        container = "mp3",
-                        audio_codec = "mp3",
-                        parts = [
-                            PartObject(
-                                key=Callback(PlayAudio, songID=song["SongID"], ext='mp3')
-                            )
-                        ]
-                    )
-                ]
-            )
-        )
-        Log.Info(i)
-        i += 1
-
-        #track = TrackObject(
-        #    url = "http://groovshark.com",
-        #    title = song["SongName"],
-        #    artist = song["ArtistName"],
-        #    thumb = "http://images.gs-cdn.net/static/albums/120_2467142.jpg"# + songInfo["result"]["songs"][0]["CoverArtFilename"]
-        #)
-
-        #media = MediaObject(
-        #    container = "mp3",
-        #    audio_codec = "mp3"
-        #)
-
-        #media.add(PartObject(key=Callback(PlayAudio, songID=song["SongID"], ext='mp3')))
-        #track.add(media)
-
-        #oc.add(track)
-        #oc.add(DirectoryObject(
-        #    key = Callback(PlaySong, songID = song["SongID"]),
-        #    title = song["SongName"] + " - " + song["ArtistName"]
-        #))
+        oc.add(GetTrack(song))
 
     return oc
 
-def PlaySong(songID):
-    return ''
-#    track = TrackObject(
-#        url = "http://groovshark.com",
-#        title = "Test Song",
-#        artist = "Test Artist",
-#        thumb = "http://images.gs-cdn.net/static/albums/120_2467142.jpg"# + songInfo["result"]["songs"][0]["CoverArtFilename"]
-#    )
+####################################################################################################
 
-#    media = MediaObject(
-#        container = "mp3",
-#        audio_codec = "mp3"
-#    )
+def UserFavoriteSongsMenu():
+    oc = ObjectContainer(
+        title1 = "Favorite Songs"
+    )
 
-#    media.add(PartObject(key=Callback(PlayAudio, songID=songID, ext='mp3')))
+    songs = grooveshark.api_call('getUserFavoriteSongs', {})
 
-#    track.add(media)
-#    return track
+    for song in songs["result"]["songs"]:
+        oc.add(GetTrack(song))
+
+    return oc
+
+####################################################################################################
+
+def SearchMenu():
+    oc = ObjectContainer(
+        title1 = "Search"
+    )
+
+    oc.add(InputDirectoryObject(key=Callback(SearchArtists), title="Artists...", prompt="Search for Artists"))
+
+    return oc
+
+####################################################################################################
+
+def SearchArtists(query):
+    oc = ObjectContainer(
+        title1 = "Search - Artists"
+    )
+
+    artists =  grooveshark.api_call('getArtistSearchResults', {"query": query})
+
+    for artist in artists["result"]["artists"]:
+        oc.add(DirectoryObject(
+            key = Callback(SearchArtists, query = query),       #ArtistID
+            title = artist["ArtistName"]
+        ))
+
+    oc.add(DirectoryObject(
+        key = Callback(SearchArtists, query = query),
+        title = JSON.StringFromObject(artists)
+    ))
+
+    return oc
+
+####################################################################################################
+
+def GetTrack(song):
+    coverUrl = ''
+    if song["CoverArtFilename"] != None:
+        coverUrl = song["CoverArtFilename"]
+
+    track = TrackObject(
+        key=Callback(GetTrack, song=song),
+        rating_key=song['SongName'] + " - " + song["ArtistName"],
+        title = song["SongName"],
+        artist = song["ArtistName"],
+        thumb = "http://images.gs-cdn.net/static/albums/" + coverUrl,
+        items = [
+            MediaObject(
+                container = "mp3",
+                audio_codec = "mp3",
+                parts = [
+                    PartObject(
+                        key=Callback(PlayAudio, songID=song["SongID"], ext='mp3')
+                    )
+                ]
+            )
+        ]
+    )
+
+    return track
+
+####################################################################################################
 
 def PlayAudio(songID):
     COUNTRY_OBJECT = grooveshark.api_call('getCountry', {})["result"]
